@@ -7,10 +7,10 @@ I searched around online and noticed many other people who have written this kat
 The bugs were to do with the number of rolls per frame.  Most solutions to this kata I see online assume each frame is two rolls.
 Some solutions do take into account the third possible roll in the 10th frame, but none take into account that a Strike is a frame with only one roll.
 
-This leads to a solution where frameIndex = frameIndex + 2 will skip a valid roll, unless the User knows to call Roll twice for each frame (even on a strike).
-// Strike
-Roll(10)
-Roll(0) // Not Intuitive
+This leads to a solution where frameIndex = frameIndex + 2 will skip a valid roll, unless the User knows to call Roll twice for each frame (even on a strike). </br>
+// Strike </br>
+Roll(10) </br>
+Roll(0) // Not Intuitive </br>
 
 So I decided to fix that issue by changing the design of the kata.  Call it cheating or being thurough.
 
