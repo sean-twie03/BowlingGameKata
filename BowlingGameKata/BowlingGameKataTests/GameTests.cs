@@ -1,82 +1,102 @@
 using System;
 using Xunit;
 using BowlingGameKata;
+using System.Collections.Generic;
 
 namespace BowlingGameKataTests
 {
     public class GameTests
     {
-        [Fact]
-        public void ScoreTwoRolls()
+        private List<Frame> GenerateNormalFrames(int numberOfFrames, int numberOfPinsPerRoll)
         {
-            Game game = new Game();
-
-            game.Roll(1);
-            game.Roll(1);
-
-            Assert.True(game.Score() == 2);
-        }
-
-        [Fact]
-        public void ScoreStikeOnFirstRoll()
-        {
-            Game game = new Game();
-
-            game.Roll(10);
-            game.Roll(1);
-            game.Roll(1);
-
-            Assert.Equal(14, game.Score());
-        }
-
-        [Fact]
-        public void ScoreSpareOnFirstRoll()
-        {
-            Game game = new Game();
-
-            game.Roll(3);
-            game.Roll(7);
-            game.Roll(1);
-
-            Assert.Equal(12, game.Score());
-        }
-
-        Random rand = new Random();
-
-        [Fact]
-        public void RandomNoStrikesOrSpares()
-        {
-            Game game = new Game();
-
-            int score = 0;
-            for (int i = 0; i < 20; i++)
+            List<Frame> frames = new List<Frame>();
+            for (int i = 0; i < numberOfFrames; i++)
             {
-                int roll = rand.Next(0, 4);
-                score += roll;
-                game.Roll(roll);
+                frames.Add(new Frame(numberOfPinsPerRoll, numberOfPinsPerRoll));
             }
+            return frames;
+        }
 
-            Assert.Equal(score, game.Score());
+        private List<Frame> GenerateStrikeFrames(int numberOfFrames)
+        {
+            List<Frame> frames = new List<Frame>();
+            for (int i = 0; i < numberOfFrames; i++)
+            {
+                frames.Add(new Frame(10));
+            }
+            return frames;
+        }
+
+        private List<Frame> GenerateSpareFrames(int numberOfFrames)
+        {
+            List<Frame> frames = new List<Frame>();
+            for (int i = 0; i < numberOfFrames; i++)
+            {
+                frames.Add(new Frame(5,5));
+            }
+            return frames;
         }
 
         [Fact]
-        public void AllStrikes()
+        public void CalculateScore10NormalFrames()
         {
-            Game game = new Game();
+            List<Frame> frames = GenerateNormalFrames(10, 1);
+            Game game = new Game(frames);
 
-            game.Roll(10);
-            game.Roll(10);
-            game.Roll(10);
-            game.Roll(10);
-            game.Roll(10);
-            game.Roll(10);
-            game.Roll(10);
-            game.Roll(10);
-            game.Roll(10);
-            game.Roll(10);
-            game.Roll(10);
+            Assert.Equal(20, game.Score);
+        }
 
-            Assert.Equal(300, game.Score());
+        [Fact]
+        public void CalculateScore1StrikeFollowedBy1NormalFrame()
+        {
+            List<Frame> frames = GenerateStrikeFrames(1);
+            frames.AddRange(GenerateNormalFrames(1, 1));
+            Game game = new Game(frames);
+
+            Assert.Equal(14, game.Score);
+        }
+
+        [Fact]
+        public void CalculateScore1StrikeFollowedBy5NormalFrame()
+        {
+            List<Frame> frames = GenerateStrikeFrames(1);
+            frames.AddRange(GenerateNormalFrames(5, 1));
+            Game game = new Game(frames);
+
+            Assert.Equal(22, game.Score);
+        }
+
+
+        [Fact]
+        public void CalculateScore12Strikes()
+        {
+            List<Frame> frames = GenerateStrikeFrames(9);
+            // Generate 10th Frame Manually
+            frames.Add(new Frame(10, 10, 10));
+            Game game = new Game(frames);
+
+            Assert.Equal(300, game.Score);
+        }
+
+        [Fact]
+        public void CalculateScore1SpareFollowedBy1NormalFrame()
+        {
+            List<Frame> frames = GenerateSpareFrames(1);
+            frames.AddRange(GenerateNormalFrames(1, 1));
+            Game game = new Game(frames);
+
+            Assert.Equal(13, game.Score);
+        }
+
+        [Fact]
+        public void CalculateScore11SparesAndAGutterBall()
+        {
+            List<Frame> frames = GenerateSpareFrames(9);
+            // Generate 10th Frame Manually
+            frames.Add(new Frame(5, 5, 0));
+            Game game = new Game(frames);
+
+            Assert.Equal(145, game.Score);
         }
 
     }

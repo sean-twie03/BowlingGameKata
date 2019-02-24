@@ -6,50 +6,65 @@ namespace BowlingGameKata
 {
     public class Game
     {
-        private List<int> _pinsPerRoll = new List<int>();
-        public void Roll(int pins)
+        public List<Frame> Frames = new List<Frame>();
+        public int Score { get { return CalculateScore(); } }
+        public Game(IEnumerable<Frame> frames)
         {
-            _pinsPerRoll.Add(pins);
+            Frames.AddRange(frames);
         }
 
-        public int Score()
+        private int CalculateScore()
         {
-            int sum = 0;
-
-            for (int i = 0; i < _pinsPerRoll.Count; i++)
+            int score = 0;
+            for (int frameIndex = 0; frameIndex < Frames.Count; frameIndex++)
             {
-                if (i >= 8)
+                score += Frames[frameIndex].FirstRoll + Frames[frameIndex].SecondRoll;
+                if (Frames[frameIndex].IsStrike)
                 {
-                   if (_pinsPerRoll[i] == 10)
+                    // If there are atleast 2 frames left in the game - Add Strike Bonus
+                    if (frameIndex + 2 < Frames.Count)
                     {
-                        sum += _pinsPerRoll[i];
-                        if (_pinsPerRoll.Count > i + 2)
-                        {
-                            sum += _pinsPerRoll[i + 1] + _pinsPerRoll[i + 2];
-                        }
-                        else if (_pinsPerRoll.Count > i + 1)
-                        {
-                            sum += _pinsPerRoll[i + 1];
-                        }
+                        score += StrikeBonus(frameIndex);
                     }
-                    
+                    // Else only add the 1 remaining frame as StrikeBonus
+                    else if (frameIndex + 1 < Frames.Count)
+                    {
+                        score += Frames[frameIndex + 1].FirstRoll + Frames[frameIndex + 1].SecondRoll;
+                    }
                 }
-                else if (_pinsPerRoll[i] == 10 && i < 9)
+                else if (Frames[frameIndex].IsSpare)
                 {
-                    sum += _pinsPerRoll[i] + _pinsPerRoll[i + 1] + _pinsPerRoll[i + 2];
-                }
-                else if (i != 0 && _pinsPerRoll[i] + _pinsPerRoll[i-1] == 10)
-                {
-                    sum += _pinsPerRoll[i] + _pinsPerRoll[i + 1];
-                }
-                else
-                {
-                    sum += _pinsPerRoll[i];
+                    // Add Spare Bonus if there is atleast 1 frame left in the game
+                    if (frameIndex + 1 < Frames.Count)
+                    {
+                        score += SpareBonus(frameIndex);
+                    }
                 }
 
+                if (Frames[frameIndex].IsExtendedTenthFrame)
+                {
+                    score += Frames[frameIndex].ThirdRoll;
+                }
             }
-
-            return sum;
+            return score;
         }
+
+        private int StrikeBonus(int frameIndex)
+        {
+            if (Frames[frameIndex + 1].IsStrike)
+            {
+                return Frames[frameIndex + 1].FirstRoll + Frames[frameIndex + 2].FirstRoll;
+            }
+            else
+            {
+                return Frames[frameIndex + 1].FirstRoll + Frames[frameIndex + 1].SecondRoll;
+            }
+        }
+
+        private int SpareBonus(int frameIndex)
+        {
+            return Frames[frameIndex + 1].FirstRoll;
+        }
+
     }
 }
