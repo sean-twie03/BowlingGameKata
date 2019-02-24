@@ -14,7 +14,7 @@ Roll(0) // Not Intuitive </br>
 
 So I decided to fix that issue by changing the design of the kata.  Call it cheating or being thurough.
 
-Instead of having the user call Roll() I changed the Game class to take a IEnumerable<Frame> in the constructor.
+Instead of having the user call Roll() I changed the Game class to take a IEnumerable\<Frame\> in the constructor.
 So prior to creating a new game, the user will create a List of 10 Frames and pass that into the Game object's constructor.
 
 The Frame constructor takes 1, 2, or 3 ints as its argument. 1 for Strike, 2 for normal rolls or a spare, or 3 for an extended 10th frame.
